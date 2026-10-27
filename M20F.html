@@ -1,206 +1,294 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Performance Estimator</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>M20F Takeoff Roll</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
 
-        body {
-            background-color: #000000;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+      body {
+        background-color: #000000;
+        color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
 
-        .container {
-            background-color: #1c1c1e;
-            width: 100%;
-            max-width: 360px;
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
+      .container {
+        background-color: #1c1c1e;
+        width: 100%;
+        max-width: 360px;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
 
-        h2 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #ff9f0a;
-        }
+      h2 {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #ff9f0a;
+      }
 
-        .input-group {
-            margin-bottom: 18px;
-        }
+      .input-group {
+        margin-bottom: 18px;
+      }
 
-        label {
-            display: block;
-            font-size: 0.9rem;
-            color: #8e8e93;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+      label {
+        display: block;
+        font-size: 0.9rem;
+        color: #8e8e93;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
 
-        input {
-            width: 100%;
-            background-color: #2c2c2e;
-            border: 1px solid #3a3a3c;
-            border-radius: 12px;
-            padding: 14px;
-            font-size: 1.2rem;
-            color: #ffffff;
-            outline: none;
-            text-align: right;
-        }
+      input {
+        width: 100%;
+        background-color: #2c2c2e;
+        border: 1px solid #3a3a3c;
+        border-radius: 12px;
+        padding: 14px;
+        font-size: 1.2rem;
+        color: #ffffff;
+        outline: none;
+        text-align: right;
+      }
 
-        input:focus {
-            border-color: #ff9f0a;
-        }
+      input:focus {
+        border-color: #ff9f0a;
+      }
 
-        .compute-btn {
-            width: 100%;
-            background-color: #ff9f0a;
-            color: #ffffff;
-            border: none;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-            margin-bottom: 24px;
-            transition: opacity 0.1s ease;
-            -webkit-tap-highlight-color: transparent;
-        }
+      /* Slider Styling */
+      input[type="range"] {
+        width: 100%;
+        -webkit-appearance: none;
+        background: #2c2c2e;
+        height: 8px;
+        border-radius: 4px;
+        outline: none;
+        margin: 12px 0;
+      }
 
-        .compute-btn:active {
-            opacity: 0.8;
-        }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #ff9f0a;
+        cursor: pointer;
+      }
 
-        .results-box {
-            background-color: #2c2c2e;
-            border-radius: 16px;
-            padding: 16px;
-            border: 1px solid #3a3a3c;
-        }
+      .slider-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: #8e8e93;
+        padding: 0 2px;
+      }
 
-        .result-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #3a3a3c;
-        }
+      .compute-btn {
+        width: 100%;
+        background-color: #ff9f0a;
+        color: #ffffff;
+        border: none;
+        border-radius: 12px;
+        padding: 16px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+        margin-bottom: 24px;
+        transition: opacity 0.1s ease;
+        -webkit-tap-highlight-color: transparent;
+      }
 
-        .result-row:nth-last-child(2) {
-            border-bottom: 1px solid #3a3a3c;
-        }
+      .compute-btn:active {
+        opacity: 0.8;
+      }
 
-        .result-row:last-child {
-            border-bottom: none;
-            padding-top: 14px;
-        }
+      .results-box {
+        background-color: #2c2c2e;
+        border-radius: 16px;
+        padding: 16px;
+        border: 1px solid #3a3a3c;
+      }
 
-        .result-label {
-            font-size: 0.9rem;
-            color: #8e8e93;
-        }
+      .result-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #3a3a3c;
+      }
 
-        .result-value {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #ffffff;
-        }
+      .result-row:nth-last-child(2) {
+        border-bottom: 1px solid #3a3a3c;
+      }
 
-        .result-row.total .result-label {
-            font-weight: 600;
-            color: #ff9f0a;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+      .result-row:last-child {
+        border-bottom: none;
+        padding-top: 14px;
+      }
 
-        .result-row.total .result-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #30d158;
-        }
+      .result-label {
+        font-size: 0.9rem;
+        color: #8e8e93;
+      }
 
-        .unit {
-            font-size: 0.9rem;
-            color: #8e8e93;
-            margin-left: 2px;
-            font-weight: normal;
-        }
+      .result-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #ffffff;
+      }
+
+      .result-row.total .result-label {
+        font-weight: 600;
+        color: #ff9f0a;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .result-row.total .result-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #30d158;
+      }
+
+      .unit {
+        font-size: 0.9rem;
+        color: #8e8e93;
+        margin-left: 2px;
+        font-weight: normal;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div class="container">
-        <h2>M20F Takeoff Roll</h2>
-        
-        <div class="input-group">
-            <label for="altitude">Density Altitude (ft)</label>
-            <input type="number" id="altitude" value="6500" min="0" max="10000" step="500">
+      <h2>M20F Takeoff Roll</h2>
+
+      <div class="input-group">
+        <label for="altitude">Density Altitude (ft)</label>
+        <input
+          type="number"
+          id="altitude"
+          value="6500"
+          min="0"
+          max="10000"
+          step="500"
+        />
+      </div>
+
+      <div class="input-group">
+        <label for="weight">Gross Weight (lbs)</label>
+        <input
+          type="number"
+          id="weight"
+          value="2400"
+          min="1500"
+          max="2740"
+          step="50"
+        />
+      </div>
+
+      <div class="input-group">
+        <label class="label-with-value" for="wind">
+          <span>Wind Component</span>
+          <span id="wind-val" class="label-val">0 kts</span>
+        </label>
+        <!-- Negative values represent Headwind, Positive represent Tailwind -->
+        <input
+          type="range"
+          id="wind"
+          min="-30"
+          max="15"
+          value="0"
+          oninput="updateWindLabel(this.value)"
+        />
+        <div class="slider-labels">
+          <span>30kt Head</span>
+          <span>Calm</span>
+          <span>15kt Tail</span>
+        </div>
+      </div>
+
+      <button class="compute-btn" onclick="calculateRoll()">
+        Compute Performance
+      </button>
+
+      <div class="results-box">
+        <div style="display: none" class="result-row">
+          <div class="result-label">Weight Penalty</div>
+          <div class="result-value" id="weight-factor">--</div>
+        </div>
+        <div style="display: none" class="result-row">
+          <div class="result-label">Altitude Penalty</div>
+          <div class="result-value" id="altitude-factor">--</div>
+        </div>
+        <div class="result-row">
+          <div class="result-label">Clear 50' Obstacle</div>
+          <div class="result-value" id="obstacle-distance">--</div>
         </div>
 
-        <div class="input-group">
-            <label for="weight">Gross Weight (lbs)</label>
-            <input type="number" id="weight" value="2400" min="1500" max="2740" step="50">
+        <div class="result-row">
+          <div class="result-label">Takeoff GPH</div>
+          <div class="result-value" id="takeoff-GPH">--</div>
         </div>
 
-        <button class="compute-btn" onclick="calculateRoll()">Compute Performance</button>
-
-        <div class="results-box">
-            <div style="display: none" class="result-row">
-                <div class="result-label">Weight Penalty</div>
-                <div class="result-value" id="weight-factor">--</div>
-            </div>
-            <div style="display: none"  class="result-row">
-                <div class="result-label">Altitude Penalty</div>
-                <div class="result-value" id="altitude-factor">--</div>
-            </div>
-            <div class="result-row">
-                <div class="result-label">Clear 50' Obstacle</div>
-                <div class="result-value" id="obstacle-distance">--</div>
-            </div>
-
-            <div class="result-row">
-                <div class="result-label">Takeoff GPH</div>
-                <div class="result-value" id="takeoff-GPH">--</div>
-            </div>
-
-            <div class="result-row total">
-                <div class="result-label">Ground Roll</div>
-                <div class="result-value" id="total-roll">--<span class="unit">ft</span></div>
-            </div>
+        <div class="result-row total">
+          <div class="result-label">Ground Roll</div>
+          <div class="result-value" id="total-roll">
+            --<span class="unit">ft</span>
+          </div>
         </div>
+      </div>
     </div>
 
-<script>
-    function calculateRoll() {
-        const alt = parseFloat(document.getElementById('altitude').value) || 0;
-        const wt = parseFloat(document.getElementById('weight').value) || 0;
-        
-        const baseRoll = 815; 
+    <script>
+      function updateWindLabel(val) {
+        const numValue = parseInt(val);
+        const label = document.getElementById("wind-val");
+        if (numValue < 0) {
+          label.innerText = Math.abs(numValue) + " kt Head";
+          label.style.color = "#30d158"; // Green for helpful headwind
+        } else if (numValue > 0) {
+          label.innerText = numValue + " kt Tail";
+          label.style.color = "#ff453a"; // Red for penalizing tailwind
+        } else {
+          label.innerText = "0 kts";
+          label.style.color = "#ff9f0a";
+        }
+      }
+
+      function calculateRoll() {
+        const alt = parseFloat(document.getElementById("altitude").value) || 0;
+        const wt = parseFloat(document.getElementById("weight").value) || 0;
+        const wind = parseInt(document.getElementById("wind").value) || 0;
+
+        const baseRoll = 815;
         const maxGrossWeight = 2740;
 
         if (wt <= 0) {
-            document.getElementById('weight-factor').innerText = '0.00x';
-            document.getElementById('altitude-factor').innerText = '0.00x';
-            document.getElementById('obstacle-distance').innerText = '--';
-            document.getElementById('total-roll').innerHTML = '0<span class="unit">ft</span>';
-            return;
+          document.getElementById("weight-factor").innerText = "0.00x";
+          document.getElementById("altitude-factor").innerText = "0.00x";
+          document.getElementById("obstacle-distance").innerText = "--";
+          document.getElementById("total-roll").innerHTML =
+            '0<span class="unit">ft</span>';
+          return;
         }
 
         // Weight scaling factor calculation
@@ -213,21 +301,34 @@
         let estimatedRoll = baseRoll * weightFactor * altitudeFactor;
         if (estimatedRoll < 0) estimatedRoll = 0;
 
+        // Wind adjustment factors
+        if (wind < 0) {
+          // Headwind correction: Decrease ground roll by ~10% for every 4 knots of headwind
+          const headwindKnots = Math.abs(wind);
+          estimatedRoll *= 1 - (headwindKnots / 4) * 0.1;
+        } else if (wind > 0) {
+          // Tailwind correction: Increase ground roll by ~20% for every 3 knots of tailwind
+          estimatedRoll *= 1 + (wind / 3) * 0.2;
+        }
+
         // Standard performance profile calculation to clear a 50-foot obstacle (~1.65x ground roll baseline)
         let estimatedObstacle = estimatedRoll * 1.65;
 
         // GPH (200×(1−((Compute Takeoff::B3÷1000)×0.03))×0.5)÷6
-        let takeoffGPH = (200 * (1 - ((alt/1000) * 0.03)) * 0.5) / 6;
-
+        let takeoffGPH = (200 * (1 - (alt / 1000) * 0.03) * 0.5) / 6;
 
         // Output specific breakdown values into their respective UI fields
-        document.getElementById('weight-factor').innerText = weightFactor.toFixed(2) + 'x';
-        document.getElementById('altitude-factor').innerText = altitudeFactor.toFixed(2) + 'x';
-        document.getElementById('obstacle-distance').innerHTML = `${Math.round(estimatedObstacle)}<span class="unit">ft</span>`;
-        document.getElementById('total-roll').innerHTML = `${Math.round(estimatedRoll)}<span class="unit">ft</span>`;
-        document.getElementById('takeoff-GPH').innerHTML = `${takeoffGPH.toFixed(1)}<span class="unit">GPH</span>`;
-    }
-</script>
-
-</body>
+        document.getElementById("weight-factor").innerText =
+          weightFactor.toFixed(2) + "x";
+        document.getElementById("altitude-factor").innerText =
+          altitudeFactor.toFixed(2) + "x";
+        document.getElementById("obstacle-distance").innerHTML =
+          `${Math.round(estimatedObstacle)}<span class="unit">ft</span>`;
+        document.getElementById("total-roll").innerHTML =
+          `${Math.round(estimatedRoll)}<span class="unit">ft</span>`;
+        document.getElementById("takeoff-GPH").innerHTML =
+          `${takeoffGPH.toFixed(1)}<span class="unit">GPH</span>`;
+      }
+    </script>
+  </body>
 </html>
