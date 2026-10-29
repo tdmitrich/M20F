@@ -290,7 +290,11 @@
             '0<span class="unit">ft</span>';
           return;
         }
-
+        /*
+          Ground roll claculation
+          (weight/Gross Weight)^2 * 1.12^(alt/1000) * 815
+          Increases ground roll 12% per thousand feet adjusted for weight
+        */
         // Weight scaling factor calculation
         const weightFactor = Math.pow(wt / maxGrossWeight, 2);
 

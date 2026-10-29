@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mooney M20F Flight Performance Stack</title>
+    <style>
+      :root {
+        --primary: #1e293b;
+        --accent: #2563eb;
+        --danger: #dc2626;
+        --success: #16a34a;
+        --bg: #f8fafc;
+      }
+      body {
+        font-family: system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--primary);
+        padding: 20px;
+      }
+      .tab-container {
+        max-width: 650px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+      }
+      .tabs {
+        display: flex;
+        background: #e2e8f0;
+        border-bottom: 1px solid #cbd5e1;
+      }
+      .tab-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        background: none;
+        font-weight: 600;
+        cursor: pointer;
+        color: #64748b;
+        transition: all 0.2s;
+      }
+      .tab-btn.active {
+        background: white;
+        color: var(--accent);
+        border-bottom: 2px solid var(--accent);
+      }
+      .tab-content {
+        display: none;
+        padding: 24px;
+      }
+      .tab-content.active {
+        display: block;
+      }
+      .grid-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1.2fr;
+        gap: 12px;
+        margin-bottom: 12px;
+        align-items: center;
+      }
+      label {
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+      span.arm-tag {
+        font-family: monospace;
+        color: #64748b;
+        font-size: 0.85rem;
+        text-align: center;
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 4px;
+      }
+      input {
+        width: 100%;
+        padding: 6px 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      .summary-box {
+        margin-top: 20px;
+        padding: 16px;
+        border-radius: 6px;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+      }
+      .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+        font-size: 0.95rem;
+      }
+      .summary-item.total {
+        font-weight: bold;
+        border-top: 1px solid #cbd5e1;
+        padding-top: 6px;
+        margin-top: 6px;
+      }
+      .status-banner {
+        margin-top: 14px;
+        padding: 10px;
+        border-radius: 4px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+      .status-pass {
+        background: #dcfce7;
+        color: var(--success);
+      }
+      .status-fail {
+        background: #fee2e2;
+        color: var(--danger);
+        text-align: left;
+        font-weight: normal;
+      }
+      .status-fail ul {
+        margin: 4px 0 0 20px;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tab-container">
+      <!-- Navigation Tabs -->
+      <div class="tabs">
+        <button class="tab-btn" onclick="switchTab('takeoff')">
+          Takeoff Roll
+        </button>
+        <button class="tab-btn active" onclick="switchTab('weight-balance')">
+          Weight & Balance
+        </button>
+      </div>
+
+      <!-- Takeoff Tab Placeholder -->
+      <div id="takeoff" class="tab-content">
+        <h3>M20F Takeoff Roll Performance</h3>
+        <p>Performance calculations layout active.</p>
+      </div>
+
+      <!-- Weight and Balance Tab -->
+      <div id="weight-balance" class="tab-content active">
+        <div
+          class="grid-row"
+          style="
+            font-weight: bold;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 6px;
+            margin-bottom: 16px;
+          "
+        >
+          <div>Station Description</div>
+          <div style="text-align: center">Arm (Inches)</div>
+          <div>Payload Weight</div>
+        </div>
+
+        <form id="wb-form" oninput="runCalculations()">
+          <div class="grid-row">
+            <label for="aircraftWeight">Licensed Empty Weight</label>
+            <span class="arm-tag">43.50</span>
+            <input type="number" id="aircraftWeight" value="1742" step="0.1" />
+          </div>
+          <div class="grid-row">
+            <label for="oilQuarts">Engine Oil (Quarts)</label>
+            <span class="arm-tag">-11.50</span>
+            <input type="number" id="oilQuarts" value="8" max="8" min="0" />
+          </div>
+          <div class="grid-row">
+            <label for="frontSeats">Front Seats (Pilot & Pax)</label>
+            <span class="arm-tag">39.00</span>
+            <input type="number" id="frontSeats" value="340" />
+          </div>
+          <div class="grid-row">
+            <label for="rearSeats">Rear Seats (Passengers)</label>
+            <span class="arm-tag">70.70</span>
+            <input type="number" id="rearSeats" value="0" />
+          </div>
+          <div class="grid-row">
+            <label for="fuelGallons">Usable Fuel (Gallons)</label>
+            <span class="arm-tag">48.40</span>
+            <input type="number" id="fuelGallons" value="50" max="64" min="0" />
+          </div>
+          <div class="grid-row">
+            <label for="baggageA">Baggage Compartment (A)</label>
+            <span class="arm-tag">95.00</span>
+            <input type="number" id="baggageA" value="0" max="120" />
+          </div>
+          <div class="grid-row">
+            <label for="baggageB">Baggage Hat Rack (B)</label>
+            <span class="arm-tag">119.00</span>
+            <input type="number" id="baggageB" value="0" max="10" />
+          </div>
+        </form>
+
+        <!-- Dynamic Output Breakdown -->
+        <div class="summary-box">
+          <div class="summary-item">
+            <span>Aircraft Operating Weight:</span>
+            <span id="out-weight">0 lbs</span>
+          </div>
+          <div class="summary-item">
+            <span>Total Flight Moment:</span>
+            <span id="out-moment">0 lb-in</span>
+          </div>
+          <div class="summary-item total">
+            <span>Calculated Center of Gravity:</span>
+            <span id="out-cg">0.00 in</span>
+          </div>
+          <div
+            class="summary-item"
+            style="font-size: 0.85rem; color: #64748b; margin-top: 4px"
+          >
+            <span>Valid Limit Envelope at this Weight:</span>
+            <span><span id="out-fwd-lim">0.0</span>" to 51.6"</span>
+          </div>
+
+          <div id="status-banner" class="status-banner"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Tab switching architecture
+      function switchTab(tabId) {
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((el) => el.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((el) => el.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+        event.currentTarget.classList.add("active");
+      }
+
+      // Mathematical Evaluation Engine
+      function runCalculations() {
+        const config = {
+          maxGross: 2740,
+          maxBagA: 120,
+          maxBagB: 10,
+          aftCG: 51.6,
+          arms: {
+            empty: 43.5,
+            oil: -11.5,
+            front: 39.0,
+            rear: 70.7,
+            fuel: 48.4,
+            bagA: 95.0,
+            bagB: 119.0,
+          },
+        };
+
+        // Extract raw inputs safely
+        const wEmpty =
+          parseFloat(document.getElementById("aircraftWeight").value) || 0;
+        const wOil =
+          (parseFloat(document.getElementById("oilQuarts").value) || 0) * 1.875;
+        const wFront =
+          parseFloat(document.getElementById("frontSeats").value) || 0;
+        const wRear =
+          parseFloat(document.getElementById("rearSeats").value) || 0;
+        const wFuel =
+          (parseFloat(document.getElementById("fuelGallons").value) || 0) * 6.0;
+        const wBagA =
+          parseFloat(document.getElementById("baggageA").value) || 0;
+        const wBagB =
+          parseFloat(document.getElementById("baggageB").value) || 0;
+
+        // Cumulative sum definitions
+        const totalWeight =
+          wEmpty + wOil + wFront + wRear + wFuel + wBagA + wBagB;
+        const totalMoment =
+          wEmpty * config.arms.empty +
+          wOil * config.arms.oil +
+          wFront * config.arms.front +
+          wRear * config.arms.rear +
+          wFuel * config.arms.fuel +
+          wBagA * config.arms.bagA +
+          wBagB * config.arms.bagB;
+
+        const calculatedCG = totalWeight > 0 ? totalMoment / totalWeight : 0;
+
+        // Linear calculation for forward CG limit expansion curve
+        let fwdLimit = 41.0;
+        if (totalWeight > 2200) {
+          fwdLimit =
+            41.0 +
+            ((totalWeight - 2200) / (config.maxGross - 2200)) * (45.0 - 41.0);
+        }
+
+        // Structural Error Array Generation
+        let errors = [];
+        if (totalWeight > config.maxGross)
+          errors.push(`Exceeds Max Gross Weight (${config.maxGross} lbs)`);
+        if (wBagA > config.maxBagA)
+          errors.push(`Exceeds Baggage Area A Limit (${config.maxBagA} lbs)`);
+        if (wBagB > config.maxBagB)
+          errors.push(`Exceeds Baggage Hat Rack Limit (${config.maxBagB} lbs)`);
+        if (calculatedCG < fwdLimit && totalWeight > 0)
+          errors.push("Forward Center of Gravity Limit Exceeded");
+        if (calculatedCG > config.aftCG)
+          errors.push("Aft Center of Gravity Limit Exceeded");
+
+        // Element Render Pipeline
+        document.getElementById("out-weight").innerText =
+          `${totalWeight.toFixed(1)} lbs`;
+        document.getElementById("out-moment").innerText =
+          `${totalMoment.toFixed(1)} lb-in`;
+        document.getElementById("out-cg").innerText =
+          `${calculatedCG.toFixed(2)} in`;
+        document.getElementById("out-fwd-lim").innerText = fwdLimit.toFixed(2);
+
+        const banner = document.getElementById("status-banner");
+        if (errors.length === 0 && totalWeight > 0) {
+          banner.className = "status-banner status-pass";
+          banner.innerText = "✓ Flight Manifest Within Envelope Limits";
+        } else {
+          banner.className = "status-banner status-fail";
+          banner.innerHTML = `<strong>⚠️ Envelope Violation:</strong><ul>${errors.map((e) => `<li>${e}</li>`).join("")}</ul>`;
+        }
+      }
+
+      // Initial load evaluation calculation execution
+      window.onload = runCalculations;
+    </script>
+  </body>
+</html>
