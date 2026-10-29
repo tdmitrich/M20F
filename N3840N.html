@@ -387,6 +387,11 @@
             <div><i id="crossWindDirection" class="arrow hidden"></i></div>
             <div class="result-value" id="crossWind">--</div>
           </div>
+          <div class="result-row">
+            <div class="result-label">Head Wind</div>
+            <div><i id="headWindDirection" class="arrow hidden"></i></div>
+            <div class="result-value" id="headWindSpeed">--</div>
+          </div>
         </div>
         <!---------------------------
          Weight and Balance Tab 
@@ -446,10 +451,12 @@
               <span>Aircraft Operating Weight:</span>
               <span id="out-weight">0 lbs</span>
             </div>
+            <!--
             <div class="summary-item">
               <span>Total Flight Moment:</span>
               <span id="out-moment">0 lb-in</span>
             </div>
+          -->
             <div class="summary-item total">
               <span>Calculated Center of Gravity:</span>
               <span id="out-cg">0.00 in</span>
@@ -678,10 +685,15 @@
         }
 
         // Return rounded to 1 decimal place
-        crosswind = Math.round(rawCrosswind * 10) / 10;
+        let crosswind = Math.round(rawCrosswind * 10) / 10;
         crosswind = Math.abs(rawCrosswind);
+        let headwind = Math.round(headwindRaw * 10) / 10;
+        headwind = Math.abs(headwindRaw);
+
         document.getElementById("crossWind").innerText =
           `${crosswind.toFixed(1)} kts`;
+        document.getElementById("headWindSpeed").innerText =
+          `${headwind.toFixed(1)} kts`;
 
         const crossWindDirection =
           document.getElementById("crossWindDirection");
@@ -697,6 +709,13 @@
         crossWindDirection.classList.remove("down"); // Shows it
         if (windFrom == "Right") crossWindDirection.classList.add("left");
         else crossWindDirection.classList.add("right");
+
+        headWindDirection.classList.remove("hidden"); // Shows it
+        headWindDirection.classList.remove("up"); // Shows it
+        headWindDirection.classList.remove("down"); // Shows it
+        if (longitudinalType == "Headwind")
+          headWindDirection.classList.add("up");
+        else headWindDirection.classList.add("down");
       }
 
       function runCalculations() {
@@ -770,8 +789,9 @@
         // Element Render Pipeline
         document.getElementById("out-weight").innerText =
           `${totalWeight.toFixed(1)} lbs`;
-        document.getElementById("out-moment").innerText =
-          `${totalMoment.toFixed(1)} lb-in`;
+
+        //document.getElementById("out-moment").innerText =
+        //  `${totalMoment.toFixed(1)} lb-in`;
         document.getElementById("out-cg").innerText =
           `${calculatedCG.toFixed(2)} in`;
         document.getElementById("out-fwd-lim").innerText = fwdLimit.toFixed(2);
